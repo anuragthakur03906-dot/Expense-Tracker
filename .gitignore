@@ -1,210 +1,57 @@
-# ==========================================
-# DEPENDENCIES
-# ==========================================
+# ======================
+# Dependencies
+# ======================
 node_modules/
-client/node_modules/
-server/node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-server/package-lock.json
-client/package-lock.json
 
-# ==========================================
-# ENVIRONMENT VARIABLES (IMPORTANT 🔐)
-# ==========================================
+# ======================
+# Environment Variables 🔐
+# ======================
 .env
 .env.*
 !.env.example
-.env.development
-.env.production
-.env.local
-.env.development.local
-.env.production.local
-server/.env
-client/.env
-server/.env.*
-client/.env.*
 
-# ==========================================
-# BUILD FILES
-# ==========================================
+# ======================
+# Build Files
+# ======================
 dist/
-dist-ssr/
 build/
-client/dist/
-client/build/
-server/dist/
-server/build/
 .next/
 out/
 
-# ==========================================
-# LOGS
-# ==========================================
+# ======================
+# Logs
+# ======================
 logs/
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-server/logs/
-client/logs/
 
-# ==========================================
-# CACHE
-# ==========================================
-.vite/
+# ======================
+# Cache
+# ======================
 .cache/
 .parcel-cache/
-.eslintcache
-.stylelintcache
-*.tsbuildinfo
-client/.vite/
-server/.vite/
+coverage/
 
-# ==========================================
-# OS FILES
-# ==========================================
+# ======================
+# OS Files
+# ======================
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-Desktop.ini
-$RECYCLE.BIN/
 
-# ==========================================
-# IDE FILES
-# ==========================================
+# ======================
+# IDE
+# ======================
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.history/
-*.iml
-out/
 
-# ==========================================
-# DATABASE FILES
-# ==========================================
-data/
-db-data/
-mongodb-data/
-dump/
-*.db
-*.sqlite
-*.sqlite3
-server/data/
-server/dump/
-
-# ==========================================
-# BACKEND SPECIFIC
-# ==========================================
+# ======================
+# Backend
+# ======================
 uploads/
-temp-uploads/
-images/
-temp/
-files/
-server/uploads/
-server/temp/
-server/images/
-.pm2/
-*.pem
-*.cert
-*.key
-*.p12
-*.pfx
-secrets.json
-config/secrets.json
-server/secrets.json
-debug.log
-
-# ==========================================
-# FRONTEND SPECIFIC
-# ==========================================
-.sass-cache/
-*.css.map
-*.min.css
-*.min.js
-webpack-stats.json
-dist-analyze/
-screenshots/
-cypress/screenshots/
-cypress/videos/
-storybook-static/
-
-# ==========================================
-# TESTING COVERAGE
-# ==========================================
-coverage/
-.nyc_output/
-*.lcov
-server/coverage/
-client/coverage/
-
-# ==========================================
-# DOCKER
-# ==========================================
-.docker/
-Dockerfile.dev
-docker-compose.override.yml
-docker-compose.dev.yml
-*.dockerignore
-
-# ==========================================
-# MISC
-# ==========================================
-*.bak
-*.backup
-*.old
-*.tmp
-*.temp
-*.zip
-*.tar
-*.gz
-*.rar
-*.7z
 tmp/
-temp/
-*.pid
-*.seed
-*.pid.lock
 
-# ==========================================
-# NPM / YARN
-# ==========================================
-.npm
-.yarn-integrity
-.yarn/cache
-.yarn/unplugged
-.pnp.js
-.pnp/
-.pnp.cjs
-
-# ==========================================
-# GRUNT / GULP
-# ==========================================
-.grunt
-.gulp
-
-# ==========================================
-# TYPEORM
-# ==========================================
-ormconfig.json
-
-# ==========================================
-# PM2
-# ==========================================
-.pm2/
-pm2.log
-pm2-*.log
+# ======================
+# Frontend
+# ======================
+.eslintcache
+.stylelintcache
