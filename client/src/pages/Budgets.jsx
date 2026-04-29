@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout';
-import axios from 'axios';
+import api from "../services/api";
 import toast from 'react-hot-toast';
 import { FiAlertCircle, FiCheckCircle, FiEdit2, FiTrash2 } from 'react-icons/fi';
 
@@ -9,6 +9,9 @@ const Budgets = () => {
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formData, setFormData] = useState({
     category: '',
     amount: '',
@@ -20,21 +23,30 @@ const Budgets = () => {
   useEffect(() => {
     fetchBudgets();
     fetchCategories();
-  }, []);
+  }, [selectedMonth, selectedYear]); // Refetch when month/year changes
 
   const fetchBudgets = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('/api/budgets');
+      const response = await api.get('/budgets', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
+      console.log('Fetched budgets:', response.data); // Debug log
       setBudgets(response.data);
     } catch (error) {
-      toast.error('Failed to fetch budgets');
+      console.error('Fetch budgets error:', error);
+      toast.error(error.response?.data?.message || 'Failed to fetch budgets');
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/categories');
-      setCategories(response.data.filter(c => c.type === 'expense'));
+      const response = await api.get('/categories');
+      // Filter to only expense categories
+      const expenseCategories = response.data.filter(c => c.type === 'expense');
+      setCategories(expenseCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -42,39 +54,67 @@ const Budgets = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       if (editingBudget) {
-        await axios.put(`/api/budgets/${editingBudget._id}`, formData);
-        toast.success('Budget updated');
+        await api.put(`/budgets/${editingBudget._id}`, formData);
+        toast.success('Budget updated successfully');
       } else {
-        await axios.post('/api/budgets', formData);
-        toast.success('Budget created');
+        await api.post('/budgets', formData);
+        toast.success('Budget created successfully');
       }
-      fetchBudgets();
+      
+      // Close form and reset state
       setShowForm(false);
       setEditingBudget(null);
       setFormData({
         category: '',
         amount: '',
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
+        month: selectedMonth,
+        year: selectedYear,
         alertThreshold: 80
       });
+      
+      // Refresh budgets
+      await fetchBudgets();
     } catch (error) {
+      console.error('Submit budget error:', error);
       toast.error(error.response?.data?.message || 'Operation failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this budget?')) {
+      setLoading(true);
       try {
-        await axios.delete(`/api/budgets/${id}`);
-        toast.success('Budget deleted');
-        fetchBudgets();
+        await api.delete(`/budgets/${id}`);
+        toast.success('Budget deleted successfully');
+        await fetchBudgets();
       } catch (error) {
-        toast.error('Failed to delete budget');
+        console.error('Delete budget error:', error);
+        toast.error(error.response?.data?.message || 'Failed to delete budget');
+      } finally {
+        setLoading(false);
       }
     }
+  };
+
+  const handleEdit = (budget) => {
+    setEditingBudget(budget);
+    setFormData({
+      category: budget.category,
+      amount: budget.amount,
+      month: budget.month,
+      year: budget.year,
+      alertThreshold: budget.alertThreshold
+    });
+    setShowForm(true);
+  };
+
+  const handleMonthYearChange = () => {
+    fetchBudgets();
   };
 
   const getStatusColor = (percentage, isOverBudget) => {
@@ -109,16 +149,55 @@ const Budgets = () => {
               setFormData({
                 category: '',
                 amount: '',
-                month: new Date().getMonth() + 1,
-                year: new Date().getFullYear(),
+                month: selectedMonth,
+                year: selectedYear,
                 alertThreshold: 80
               });
               setShowForm(true);
             }}
-            className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition"
+            disabled={loading}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
           >
             + Set Budget
           </button>
+        </div>
+
+        {/* Month/Year Filter */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex gap-4 items-end">
+            <div>
+              <label className="block text-sm font-medium mb-2">Month</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className="px-3 py-2 border rounded-lg dark:bg-gray-700"
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                  <option key={month} value={month}>
+                    {new Date(2000, month - 1, 1).toLocaleString('default', { month: 'long' })}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Year</label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="px-3 py-2 border rounded-lg dark:bg-gray-700"
+              >
+                {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleMonthYearChange}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            >
+              Apply Filter
+            </button>
+          </div>
         </div>
 
         {showForm && (
@@ -130,14 +209,15 @@ const Budgets = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
-                  <select                    value={formData.category}
+                  <select
+                    value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                   >
                     <option value="">Select Category</option>
                     {categories.map(cat => (
-                      <option key={cat.name} value={cat.name}>
+                      <option key={cat._id || cat.name} value={cat.name}>
                         {cat.icon} {cat.name}
                       </option>
                     ))}
@@ -153,7 +233,7 @@ const Budgets = () => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                   />
                 </div>
                 
@@ -162,7 +242,7 @@ const Budgets = () => {
                   <select
                     value={formData.month}
                     onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                   >
                     {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                       <option key={month} value={month}>
@@ -178,7 +258,7 @@ const Budgets = () => {
                     type="number"
                     value={formData.year}
                     onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                   />
                 </div>
                 
@@ -192,7 +272,7 @@ const Budgets = () => {
                     onChange={(e) => setFormData({ ...formData, alertThreshold: parseInt(e.target.value) })}
                     min="0"
                     max="100"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Get alert when spending reaches this percentage
@@ -203,19 +283,30 @@ const Budgets = () => {
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingBudget(null);
+                  }}
                   className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
                 >
                   {editingBudget ? 'Update' : 'Create'} Budget
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {loading && budgets.length === 0 && (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="mt-2 text-gray-500">Loading budgets...</p>
           </div>
         )}
 
@@ -234,17 +325,7 @@ const Budgets = () => {
                 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => {
-                      setEditingBudget(budget);
-                      setFormData({
-                        category: budget.category,
-                        amount: budget.amount,
-                        month: budget.month,
-                        year: budget.year,
-                        alertThreshold: budget.alertThreshold
-                      });
-                      setShowForm(true);
-                    }}
+                    onClick={() => handleEdit(budget)}
                     className="text-blue-500 hover:text-blue-600"
                   >
                     <FiEdit2 />
@@ -267,13 +348,13 @@ const Budgets = () => {
                   <div className="text-right">
                     <p className="text-gray-500 dark:text-gray-400">Spent</p>
                     <p className={`font-semibold ${getStatusColor(budget.percentage, budget.isOverBudget)}`}>
-                      ${budget.actual.toFixed(2)}
+                      ${budget.actual?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-gray-500 dark:text-gray-400">Remaining</p>
                     <p className="font-semibold text-green-600 dark:text-green-400">
-                      ${budget.remaining.toFixed(2)}
+                      ${budget.remaining?.toFixed(2) || budget.amount.toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -281,13 +362,13 @@ const Budgets = () => {
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
                     className={`${getProgressColor(budget.percentage, budget.isOverBudget)} h-2 rounded-full transition-all duration-500`}
-                    style={{ width: `${Math.min(budget.percentage, 100)}%` }}
+                    style={{ width: `${Math.min(budget.percentage || 0, 100)}%` }}
                   />
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <div className="text-sm">
-                    <span className="text-gray-500">{budget.percentage.toFixed(1)}% used</span>
+                    <span className="text-gray-500">{(budget.percentage || 0).toFixed(1)}% used</span>
                   </div>
                   {budget.isAlert && !budget.isOverBudget && (
                     <div className="flex items-center text-yellow-500 text-sm">
@@ -312,12 +393,12 @@ const Budgets = () => {
             </div>
           ))}
           
-          {budgets.length === 0 && (
+          {!loading && budgets.length === 0 && (
             <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
               <FiAlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">No budgets set yet</p>
+              <p className="text-gray-500 dark:text-gray-400">No budgets set for {new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long' })} {selectedYear}</p>
               <p className="text-sm text-gray-400 mt-2">
-                Create your first budget to start tracking your spending
+                Click "Set Budget" to create your first budget
               </p>
             </div>
           )}

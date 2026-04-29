@@ -1,11 +1,25 @@
 import React from 'react';
-import { FiBell, FiUser, FiChevronDown } from 'react-icons/fi';
+import { FiBell, FiUser, FiChevronDown, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    toast.success('Logged out successfully');
+  };
+
+  const handleProfile = () => {
+    setShowDropdown(false);
+    navigate('/profile');
+  };
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm">
@@ -14,16 +28,6 @@ const Header = () => {
           {/* Search Bar - Optional */}
           <div className="flex-1 max-w-md">
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
             </div>
           </div>
 
@@ -41,7 +45,7 @@ const Header = () => {
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
-                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-gray-700 dark:text-gray-300 hidden md:inline">
@@ -54,11 +58,19 @@ const Header = () => {
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
                   <div className="py-2">
-                    <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button
+                      onClick={handleProfile}
+                      className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                    >
+                      <FiUser className="mr-2" />
                       Profile Settings
                     </button>
                     <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                    <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                    >
+                      <FiLogOut className="mr-2" />
                       Sign Out
                     </button>
                   </div>

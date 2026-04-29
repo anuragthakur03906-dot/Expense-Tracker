@@ -1,3 +1,4 @@
+// server/models/BudgetModel.js
 const mongoose = require('mongoose');
 
 const budgetSchema = new mongoose.Schema({
@@ -25,7 +26,7 @@ const budgetSchema = new mongoose.Schema({
   },
   alertThreshold: {
     type: Number,
-    default: 80, // Alert when spending reaches 80% of budget
+    default: 80,
     min: 0,
     max: 100
   }

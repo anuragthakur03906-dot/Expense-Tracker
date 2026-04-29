@@ -20,6 +20,8 @@ app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/budgets', require('./routes/budgetRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/savings', require('./routes/savingsRoutes'));
+app.use('/api/users', require('./routes/userRoutes')); 
+
 
 // Error handling middleware
 app.use(require('./middleware/errorMiddleware'));

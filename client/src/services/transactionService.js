@@ -83,16 +83,3 @@ export const bulkDeleteTransactions = async (ids) => {
     throw error.response?.data || { message: 'Failed to delete transactions' };
   }
 };
-
-// Export transactions
-export const exportTransactions = async (format, filters = {}) => {
-  try {
-    const params = new URLSearchParams({ format, ...filters }).toString();
-    const response = await api.get(`${TRANSACTIONS_URL}/export?${params}`, {
-      responseType: 'blob'
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: 'Failed to export transactions' };
-  }
-};
