@@ -2,8 +2,10 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Create authentication context
 const AuthContext = createContext();
 
+// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -17,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
+  // Set up axios authorization header when token changes
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -26,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
+  // Load user profile from API
   const loadUser = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/auth/profile');
@@ -38,6 +42,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Login user
   const login = async (email, password) => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', { 
@@ -58,6 +63,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Register new user
   const register = async (name, email, password) => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/register', { 
@@ -79,6 +85,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Logout user
   const logout = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];

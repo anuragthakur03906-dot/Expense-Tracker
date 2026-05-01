@@ -23,7 +23,7 @@ const getUserProfile = async (req, res) => {
 // @access  Private
 const updateUserProfile = async (req, res) => {
   try {
-    // ✅ FIX: Select password explicitly since it has select: false in schema
+    // FIX: Select password explicitly since it has select: false in schema
     const user = await User.findById(req.user.id).select('+password');
     
     if (!user) {

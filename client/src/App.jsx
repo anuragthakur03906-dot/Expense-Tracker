@@ -20,6 +20,7 @@ function App() {
       <AuthProvider>
         <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+            {/* Toast notifications container */}
             <Toaster 
               position="top-right"
               toastOptions={{
@@ -31,14 +32,19 @@ function App() {
               }}
             />
             <Routes>
+              {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              
+              {/* Protected Routes */}
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route path="/transactions" element={<PrivateRoute><Transactions /></PrivateRoute>} />
               <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
               <Route path="/budgets" element={<PrivateRoute><Budgets /></PrivateRoute>} />
               <Route path="/savings" element={<PrivateRoute><SavingsGoals /></PrivateRoute>} />
+              
+              {/* Catch all - redirect to dashboard */}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>

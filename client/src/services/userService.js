@@ -3,7 +3,10 @@ import api from './api';
 
 const USERS_URL = '/users';
 
-// Get user profile
+/**
+ * Get current user's profile information
+ * @returns {Promise<Object>} User profile data including name, email, preferences
+ */
 export const getUserProfile = async () => {
   try {
     const response = await api.get(`${USERS_URL}/profile`);
@@ -13,7 +16,11 @@ export const getUserProfile = async () => {
   }
 };
 
-// Update user profile
+/**
+ * Update user profile information
+ * @param {Object} userData - Updated user data (name, email, preferences)
+ * @returns {Promise<Object>} Updated user profile
+ */
 export const updateUserProfile = async (userData) => {
   try {
     const response = await api.put(`${USERS_URL}/profile`, userData);
@@ -23,7 +30,11 @@ export const updateUserProfile = async (userData) => {
   }
 };
 
-// Delete user account
+/**
+ * Delete user account permanently
+ * @returns {Promise<Object>} Success message confirming deletion
+ * @warning This action is irreversible
+ */
 export const deleteUserAccount = async () => {
   try {
     const response = await api.delete(`${USERS_URL}/profile`);

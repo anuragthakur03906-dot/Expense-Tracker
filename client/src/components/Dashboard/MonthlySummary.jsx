@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 const MonthlySummary = ({ transactions }) => {
-  // Group transactions by month
+  // Group transactions by month for chart display
   const monthlyData = React.useMemo(() => {
     const months = {};
     
@@ -29,6 +29,7 @@ const MonthlySummary = ({ transactions }) => {
         };
       }
       
+      // Add to income or expenses based on transaction type
       if (transaction.type === 'income') {
         months[monthKey].income += transaction.amount;
       } else {
@@ -36,17 +37,18 @@ const MonthlySummary = ({ transactions }) => {
       }
     });
     
-    // Convert to array and sort by date
-    return Object.values(months).slice(-6); // Last 6 months
+    // Convert to array and get last 6 months for display
+    return Object.values(months).slice(-6);
   }, [transactions]);
 
+  // Show empty state if no data
   if (monthlyData.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
           Monthly Summary
         </h3>
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+        <div className="h-48 sm:h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm sm:text-base">
           No data available for chart
         </div>
       </div>
@@ -54,17 +56,17 @@ const MonthlySummary = ({ transactions }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-sm">
+      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
         Monthly Income vs Expenses
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={280}>
         <BarChart data={monthlyData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
+          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
           <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
           <Bar dataKey="income" fill="#10B981" name="Income" />
           <Bar dataKey="expenses" fill="#EF4444" name="Expenses" />
         </BarChart>

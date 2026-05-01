@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
+  // Form state management
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense',
@@ -13,6 +14,7 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Fetch categories and populate form if editing
   useEffect(() => {
     fetchCategories();
     if (initialData) {
@@ -51,15 +53,16 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white">
         {initialData ? 'Edit Transaction' : 'Add New Transaction'}
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Amount Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Amount ($)
             </label>
             <input
@@ -69,12 +72,13 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               onChange={handleChange}
               step="0.01"
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
 
+          {/* Transaction Type Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Type
             </label>
             <select
@@ -82,15 +86,16 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               value={formData.type}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="expense">Expense</option>
               <option value="income">Income</option>
             </select>
           </div>
 
+          {/* Category Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Category
             </label>
             <select
@@ -98,7 +103,7 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               value={formData.category}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="">Select Category</option>
               {categories
@@ -111,8 +116,9 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
             </select>
           </div>
 
+          {/* Date Picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Date
             </label>
             <input
@@ -121,12 +127,13 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               value={formData.date}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {/* Description Input - Full Width */}
+          <div className="sm:col-span-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Description
             </label>
             <input
@@ -135,13 +142,14 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               value={formData.description}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="What was this for?"
             />
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {/* Notes Textarea - Full Width */}
+          <div className="sm:col-span-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
               Notes (Optional)
             </label>
             <textarea
@@ -149,24 +157,25 @@ const TransactionForm = ({ onSubmit, onCancel, initialData }) => {
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Add any additional notes..."
             />
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3">
+        {/* Form Actions */}
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition disabled:opacity-50 text-sm"
           >
             {loading ? 'Saving...' : initialData ? 'Update' : 'Add Transaction'}
           </button>

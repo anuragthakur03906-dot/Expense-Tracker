@@ -6,7 +6,7 @@ import TransactionList from '../components/Transactions/TransactionList';
 import TransactionFilters from '../components/Transactions/TransactionFilters';
 import api from "../services/api";
 import toast from 'react-hot-toast';
-import { saveAs } from 'file-saver'; // Keep only for CSV export
+import { saveAs } from 'file-saver';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -22,10 +22,12 @@ const Transactions = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
+  // Fetch transactions on component mount
   useEffect(() => {
     fetchTransactions();
   }, []);
 
+  // Apply filters whenever filters or transactions change
   useEffect(() => {
     applyFilters();
   }, [filters, transactions]);
@@ -47,6 +49,7 @@ const Transactions = () => {
   const applyFilters = () => {
     let filtered = [...transactions];
 
+    // Date range filter
     if (filters.startDate && filters.endDate) {
       filtered = filtered.filter(t => 
         new Date(t.date) >= new Date(filters.startDate) &&
@@ -54,14 +57,17 @@ const Transactions = () => {
       );
     }
 
+    // Category filter
     if (filters.category) {
       filtered = filtered.filter(t => t.category === filters.category);
     }
 
+    // Transaction type filter
     if (filters.type) {
       filtered = filtered.filter(t => t.type === filters.type);
     }
 
+    // Search by description
     if (filters.search) {
       filtered = filtered.filter(t => 
         t.description.toLowerCase().includes(filters.search.toLowerCase())
@@ -80,7 +86,7 @@ const Transactions = () => {
         await api.post('/transactions', transactionData);
         toast.success('Transaction added successfully');
       }
-      fetchTransactions();
+      fetchTransactions(); // Refresh list
       setShowForm(false);
       setEditingTransaction(null);
     } catch (error) {
@@ -107,7 +113,7 @@ const Transactions = () => {
     setShowForm(true);
   };
 
-  // Export to CSV only (PDF removed)
+  // Export filtered transactions to CSV file
   const exportToCSV = () => {
     if (filteredTransactions.length === 0) {
       toast.error('No transactions to export');
@@ -128,7 +134,7 @@ const Transactions = () => {
         t.notes || ''
       ]);
       
-      // Create CSV content
+      // Create CSV content with proper escaping
       const csvContent = [
         headers.join(','),
         ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
@@ -144,7 +150,7 @@ const Transactions = () => {
     }
   };
 
-  // Calculate summary statistics
+  // Calculate summary statistics for filtered transactions
   const getSummary = () => {
     const totalIncome = filteredTransactions
       .filter(t => t.type === 'income')
@@ -161,24 +167,25 @@ const Transactions = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="space-y-4 sm:space-y-6">
+        {/* Header with Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Transactions
           </h1>
-          <div className="space-x-2 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => {
                 setEditingTransaction(null);
                 setShowForm(true);
               }}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-blue-600 transition text-sm sm:text-base"
             >
               + Add Transaction
             </button>
             <button
               onClick={exportToCSV}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-green-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               disabled={filteredTransactions.length === 0 || loading}
             >
               Export CSV
@@ -188,26 +195,28 @@ const Transactions = () => {
 
         {/* Summary Cards */}
         {filteredTransactions.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Income</p>
-              <p className="text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total Income</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Expense</p>
-              <p className="text-2xl font-bold text-red-600">${totalExpense.toFixed(2)}</p>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total Expense</p>
+              <p className="text-lg sm:text-2xl font-bold text-red-600">${totalExpense.toFixed(2)}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Balance</p>
-              <p className={`text-2xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Balance</p>
+              <p className={`text-lg sm:text-2xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 ${balance.toFixed(2)}
               </p>
             </div>
           </div>
         )}
 
+        {/* Filters Section */}
         <TransactionFilters filters={filters} setFilters={setFilters} />
 
+        {/* Transaction Form Modal */}
         {showForm && (
           <TransactionForm
             onSubmit={handleAddTransaction}
@@ -219,6 +228,7 @@ const Transactions = () => {
           />
         )}
 
+        {/* Transactions List */}
         <TransactionList
           transactions={filteredTransactions}
           onDelete={handleDeleteTransaction}

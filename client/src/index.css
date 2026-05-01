@@ -10,14 +10,17 @@
 }
 
 @layer components {
+  /* Primary Button Styles */
   .btn-primary {
     @apply bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition duration-200;
   }
   
+  /* Secondary Button Styles */
   .btn-secondary {
     @apply bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200;
   }
   
+  /* Card Component Styles */
   .card {
     @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6;
   }

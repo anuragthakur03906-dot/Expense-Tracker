@@ -16,12 +16,14 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [aiSuggestion, setAiSuggestion] = useState(null);
 
+  // Fetch dashboard data on component mount
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
     try {
+      // Fetch both transactions and analytics in parallel
       const [transactionsRes, analyticsRes] = await Promise.all([
         axios.get('/api/transactions'),
         axios.get('/api/analytics/dashboard')
@@ -41,7 +43,7 @@ const Dashboard = () => {
     try {
       await axios.delete(`/api/transactions/${id}`);
       toast.success('Transaction deleted');
-      fetchDashboardData();
+      fetchDashboardData(); // Refresh data after deletion
     } catch (error) {
       toast.error('Failed to delete transaction');
     }
@@ -49,11 +51,11 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-primary-500 to-primary-700 rounded-xl p-6 text-white">
-          <h1 className="text-2xl font-bold">Welcome back, {user?.name}! 👋</h1>
-          <p className="mt-2 opacity-90">Here's your financial overview for today</p>
+        <div className="bg-gradient-to-r from-primary-500 to-primary-700 rounded-xl p-4 sm:p-6 text-white">
+          <h1 className="text-xl sm:text-2xl font-bold">Welcome back, {user?.name}! </h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base opacity-90">Here's your financial overview for today</p>
         </div>
 
         {/* Balance Cards */}
@@ -62,21 +64,21 @@ const Dashboard = () => {
         {/* AI Suggestion */}
         {aiSuggestion && <AISuggestion suggestion={aiSuggestion} />}
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Charts Section - Responsive grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <ExpenseChart transactions={transactions} />
           <MonthlySummary transactions={transactions} />
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               Recent Transactions
             </h2>
             <button 
               onClick={() => window.location.href = '/transactions'}
-              className="text-primary-500 hover:text-primary-600 font-medium"
+              className="text-primary-500 hover:text-primary-600 font-medium text-sm sm:text-base"
             >
               View All →
             </button>

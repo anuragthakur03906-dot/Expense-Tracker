@@ -1,21 +1,30 @@
 import axios from 'axios';
 
 // Vite uses import.meta.env instead of process.env
+// Fallback to localhost if environment variable not set
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Create axios instance
+/**
+ * Configured axios instance with base URL and default headers
+ * @constant
+ */
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000, // 10 seconds timeout for requests
 });
 
-// Request interceptor to add token
+/**
+ * Request interceptor to automatically add authentication token
+ * Runs before each request is sent
+ */
 api.interceptors.request.use(
   (config) => {
+    // Get token from localStorage
     const token = localStorage.getItem('token');
+    // Add Authorization header if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,24 +36,29 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors
+/**
+ * Response interceptor to handle common errors globally
+ * Processes responses and handles authentication failures
+ */
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response, // Pass through successful responses
   (error) => {
-    // Handle network errors
+    // Handle request timeout errors
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout');
       window.location.href = '/login?error=timeout';
     }
     
-    // Handle unauthorized errors
+    // Handle unauthorized errors (401) - token expired or invalid
     if (error.response?.status === 401) {
+      // Clear stored authentication data
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      // Redirect to login page
       window.location.href = '/login';
     }
     
-    // Handle server errors
+    // Log server errors (500+) for debugging
     if (error.response?.status >= 500) {
       console.error('Server error:', error.response.data);
     }
@@ -53,7 +67,12 @@ api.interceptors.response.use(
   }
 );
 
-// Generic API methods with better error handling
+/**
+ * Generic GET request wrapper with error handling
+ * @param {string} url - API endpoint
+ * @param {Object} params - Query parameters
+ * @returns {Promise<any>} Response data
+ */
 export const get = async (url, params = {}) => {
   try {
     const response = await api.get(url, { params });
@@ -63,6 +82,12 @@ export const get = async (url, params = {}) => {
   }
 };
 
+/**
+ * Generic POST request wrapper with error handling
+ * @param {string} url - API endpoint
+ * @param {Object} data - Request payload
+ * @returns {Promise<any>} Response data
+ */
 export const post = async (url, data = {}) => {
   try {
     const response = await api.post(url, data);
@@ -72,6 +97,12 @@ export const post = async (url, data = {}) => {
   }
 };
 
+/**
+ * Generic PUT request wrapper with error handling
+ * @param {string} url - API endpoint
+ * @param {Object} data - Request payload
+ * @returns {Promise<any>} Response data
+ */
 export const put = async (url, data = {}) => {
   try {
     const response = await api.put(url, data);
@@ -81,6 +112,11 @@ export const put = async (url, data = {}) => {
   }
 };
 
+/**
+ * Generic DELETE request wrapper with error handling
+ * @param {string} url - API endpoint
+ * @returns {Promise<any>} Response data
+ */
 export const del = async (url) => {
   try {
     const response = await api.delete(url);
@@ -90,6 +126,12 @@ export const del = async (url) => {
   }
 };
 
+/**
+ * Generic PATCH request wrapper with error handling
+ * @param {string} url - API endpoint
+ * @param {Object} data - Request payload
+ * @returns {Promise<any>} Response data
+ */
 export const patch = async (url, data = {}) => {
   try {
     const response = await api.patch(url, data);
